@@ -1,13 +1,11 @@
 on: workflow_dispatch
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-
-      - uses: actions/setup-dotnet@v1
 
       - uses: xt0rted/test-action@testing
         id: root
