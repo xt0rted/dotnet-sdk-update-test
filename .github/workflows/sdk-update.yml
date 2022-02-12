@@ -1,0 +1,27 @@
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-dotnet@v1
+
+      - uses: xt0rted/test-action@testing
+        id: root
+        with:
+          dry_run: true
+
+      - uses: xt0rted/test-action@testing
+        id: sub-folder
+        with:
+          dry_run: true
+          file_location: ./project1
+
+      - name: Dump steps context
+        if: always()
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
