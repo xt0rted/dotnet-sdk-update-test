@@ -21,7 +21,7 @@ jobs:
         id: security
         shell: bash
         run: |
-          if [ "${{ steps.sdk.outputs.security }}" = "true" ]
+          if [ "${{ steps.sdk.outputs.security-release }}" = "true" ]
           then
             echo "::set-output name=label::security"
             echo "::set-output name=message::**This update includes a security fix.**"
@@ -33,8 +33,8 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           signoff: true
-          branch: "dependabot/nuget"
-          branch-suffix: "dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
+          #branch: "dependabot/nuget"
+          #branch-suffix: "dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
           delete-branch: true
           labels: |
             dependencies
