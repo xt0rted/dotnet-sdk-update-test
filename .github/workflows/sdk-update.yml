@@ -1,4 +1,10 @@
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Indicates if the file should be updated or not
+        type: boolean
+        required: false
 
 jobs:
   update:
@@ -7,16 +13,42 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: xt0rted/test-action@testing
-        id: root
-        with:
-          dry_run: true
+      - name: Check for new sdk version
+        uses: xt0rted/dotnet-sdk-updater@testing
+        id: sdk
 
-      - uses: xt0rted/test-action@testing
-        id: sub-folder
+      - name: Create pull request
+        if: steps.sdk.outputs.updated == 'true' && steps.sdk.outputs.dry-run == 'false'
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
         with:
-          dry_run: true
-          file_location: ./project1
+          signoff: true
+          branch: "dependabot/nuget"
+          branch-suffix: "dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
+          delete-branch: true
+          labels: |
+            dependencies
+            .NET
+            ${{ steps.sdk.outputs.security ? 'security' : '' }}
+          commit-message: |
+            Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}. ${{ steps.sdk.outputs.security ? '**This update includes a security fix.**' : '' }}"
+
+            - [Release notes](https://github.com/dotnet/core/releases/tag/v${{ steps.sdk.outputs.updated-version-to }})
+            - [Changelog](${{ steps.sdk.outputs.release-notes }})
+
+            ---
+            updated-dependencies:
+            - dependency-name: dotnet-sdk
+              dependency-type: direct:production
+              update-type: version-update:${{ steps.sdk.outputs.update-type }}
+            ...
+          title: |
+            Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}
+          body: |
+            Bumps [dotnet sdk](https://github.com/dotnet/sdk) from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}". ${{ steps.sdk.outputs.security ? '**This update includes a security fix.**' : '' }}"
+
+            - [Release notes](https://github.com/dotnet/core/releases/tag/v${{ steps.sdk.outputs.updated-version-to }})
+            - [Changelog](${{ steps.sdk.outputs.release-notes }})
 
       - name: Dump steps context
         if: always()
