@@ -41,6 +41,8 @@ jobs:
             .NET
             ${{ steps.security.outputs.label }}
           commit-message: |
+            Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}
+
             Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}. ${{ steps.security.outputs.message }}
 
             - [Release notes](https://github.com/dotnet/core/releases/tag/v${{ steps.sdk.outputs.updated-version-to }})
@@ -57,7 +59,7 @@ jobs:
           body: |
             Bumps [dotnet sdk](https://github.com/dotnet/sdk) from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}". ${{ steps.security.outputs.message }}
 
-            - [Release notes](https://github.com/dotnet/core/releases/tag/v${{ steps.sdk.outputs.updated-version-to }})
+            - [Release notes](https://github.com/dotnet/core/releases/tag/v${{ steps.sdk.outputs.release-version }})
             - [Changelog](${{ steps.sdk.outputs.release-notes }})
 
       - name: Dump steps context
