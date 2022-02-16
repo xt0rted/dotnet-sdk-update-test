@@ -17,6 +17,15 @@ jobs:
         uses: xt0rted/dotnet-sdk-updater@testing
         id: sdk
 
+      - name: Security label
+        id: labels
+        shell: bash
+        run: |
+          if [ '${{ steps.sdk.outputs.security }}' = 'true' ]
+          then
+            echo "::set-output name=security-label::security"
+          fi
+
       - name: Create pull request
         if: steps.sdk.outputs.updated == 'true' && steps.sdk.outputs.dry-run == 'false'
         id: cpr
@@ -29,7 +38,7 @@ jobs:
           labels: |
             dependencies
             .NET
-            ${{ steps.sdk.outputs.security == 'true' ? 'security' : '' }}
+            ${{ steps.labels.outputs.security-label }}
           commit-message: |
             Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}. ${{ steps.sdk.outputs.security ? '**This update includes a security fix.**' : '' }}"
 
