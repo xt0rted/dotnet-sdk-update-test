@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Indicates if the file should be updated or not
+        description: Should updating the file be skipped?
         type: boolean
         required: false
 
@@ -10,12 +10,20 @@ jobs:
   update:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        file-location:
+          - ./
+          - ./project1
+
     steps:
       - uses: actions/checkout@v2
 
       - name: Check for new sdk version
         uses: xt0rted/dotnet-sdk-updater@v1.0.0
         id: sdk
+        with:
+          file-location:  ${{ matrix.file-location }}
 
       - name: Security update
         id: security
