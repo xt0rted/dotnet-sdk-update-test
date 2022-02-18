@@ -35,7 +35,7 @@ jobs:
           token: ${{ secrets.DOTNET_SDK_UPDATER_TOKEN }}
           signoff: true
           branch: "dependabot/nuget/dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
-          ranch-suffix: "random"
+          branch-suffix: "random"
           delete-branch: true
           labels: |
             dependencies
