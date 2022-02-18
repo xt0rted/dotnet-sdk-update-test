@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Should updating the file be skipped?
+        description: Skip updating the file
         type: boolean
         required: false
 
