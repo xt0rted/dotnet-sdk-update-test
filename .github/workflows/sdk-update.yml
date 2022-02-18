@@ -32,9 +32,8 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v3
         with:
+          token: ${{ secrets.DOTNET_SDK_UPDATER_TOKEN }}
           signoff: true
-          #branch: "dependabot/nuget"
-          #branch-suffix: "dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
           delete-branch: true
           labels: |
             dependencies
