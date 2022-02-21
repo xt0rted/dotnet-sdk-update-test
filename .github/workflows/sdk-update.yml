@@ -48,6 +48,8 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ steps.generate_token.outputs.token }}
+          author: dotnet-sdk-updater[bot] <100138291+dotnet-sdk-updater[bot]@users.noreply.github.com>
+          committer: dotnet-sdk-updater[bot] <100138291+dotnet-sdk-updater[bot]@users.noreply.github.com>
           signoff: true
           branch: "dependabot/nuget/dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
           branch-suffix: "random"
