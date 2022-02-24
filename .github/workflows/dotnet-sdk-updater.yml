@@ -1,3 +1,5 @@
+name: .NET SDK updater
+
 on:
   workflow_dispatch:
     inputs:
@@ -24,7 +26,8 @@ jobs:
           app_id: ${{ secrets.DOTNET_SDK_UPDATER_APP_ID }}
           private_key: ${{ secrets.DOTNET_SDK_UPDATER_PRIVATE_KEY }}
 
-      - uses: actions/checkout@v2
+      - name: Check out repo
+        uses: actions/checkout@v2.4.0
 
       - name: Check for new sdk version
         uses: xt0rted/dotnet-sdk-updater@v1.0.0
@@ -32,7 +35,8 @@ jobs:
         with:
           file-location:  ${{ matrix.file-location }}
 
-      - name: Security update
+      - name: Security update check
+        if: steps.sdk.outputs.updated == 'true'
         id: security
         shell: bash
         run: |
@@ -45,19 +49,12 @@ jobs:
       - name: Create pull request
         if: steps.sdk.outputs.updated == 'true' && steps.sdk.outputs.dry-run == 'false'
         id: cpr
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v3.12.1
         with:
           token: ${{ steps.generate_token.outputs.token }}
           author: dotnet-sdk-updater[bot] <100138291+dotnet-sdk-updater[bot]@users.noreply.github.com>
-          committer: dotnet-sdk-updater[bot] <100138291+dotnet-sdk-updater[bot]@users.noreply.github.com>
           signoff: true
-          branch: "dependabot/nuget/dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
-          branch-suffix: "random"
-          delete-branch: true
-          labels: |
-            dependencies
-            .NET
-            ${{ steps.security.outputs.label }}
+          committer: dotnet-sdk-updater[bot] <100138291+dotnet-sdk-updater[bot]@users.noreply.github.com>
           commit-message: |
             Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}
 
@@ -72,6 +69,8 @@ jobs:
               dependency-type: direct:production
               update-type: version-update:${{ steps.sdk.outputs.update-type }}
             ...
+          branch: "dependabot/nuget/dotnet-sdk-${{ steps.sdk.outputs.updated-version-to }}"
+          delete-branch: true
           title: |
             Bump dotnet sdk from ${{ steps.sdk.outputs.updated-version-from }} to ${{ steps.sdk.outputs.updated-version-to }}
           body: |
@@ -79,6 +78,10 @@ jobs:
 
             - [Release notes](https://github.com/dotnet/core/releases/tag/v${{ steps.sdk.outputs.release-version }})
             - [Changelog](${{ steps.sdk.outputs.release-notes }})
+          labels: |
+            dependencies
+            .NET
+            ${{ steps.security.outputs.label }}
 
       - name: Dump steps context
         if: always()
